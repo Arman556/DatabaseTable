@@ -20,8 +20,9 @@ $$
 LANGUAGE plpgsql;
 CREATE TRIGGER last_updation
   BEFORE UPDATE OR INSERT
-  ON employee
+  ON users
   FOR EACH ROW
   EXECUTE PROCEDURE update_validations();
 
-
+  ALTER TABLE users
+ADD timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP;

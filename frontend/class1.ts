@@ -2,6 +2,7 @@ import * as Imp from "./class2.js";
 import * as Imp1 from "./class4.js";
 let this1 = new Imp.fetchData();
 let obj2=new Imp1.validations();
+let obj3=new Imp.ids();
 class actions {
   flag: boolean;
   copy: any[];
@@ -12,7 +13,6 @@ class actions {
   table:any;
   arr:any;
   Emp:any;
-  //cell:any[]=[];
   constructor() {
     this.copy = [];
     this.arrHeaders = [];
@@ -29,13 +29,8 @@ class actions {
       div.innerHTML = " ";
     }
     this1.fetch1().then(data => obj.create(data));
-    // let data1=this1.fetch1();
-    // this.create(data1);
   }
   create(Emp:any) {
-    // document.getElementById("LOAD").innerHTML = "REFRESH DATA";
-    // let div = document.getElementById("id1");
-    // div.innerHTML = " ";
     this.Emp=Emp;
     this.table = document.createElement("table");
     this.arrHeaders = [
@@ -45,7 +40,8 @@ class actions {
       "email",
       "phoneno",
       "role",
-      "address"
+      "address",
+      "website"
     ];
     this.flag=true;
     this.rows = Emp.length;
@@ -72,8 +68,9 @@ class actions {
         '<td class="cell' + Emp[c].empid + '">' + Emp[c].lastname + "</td>" +
         '<td class="cell' + Emp[c].empid + '">' + Emp[c].email + "</td>" +
         '<td class="cell' + Emp[c].empid + '">' + Emp[c].phoneno + "</td>" +
-        '<td class="cell' + Emp[c].empid + '">' + Imp.ROLES[Emp[c].role] + "</td>" +
+        '<td class="cell' + Emp[c].empid + '">' + Emp[c].fname + "</td>" +
         '<td class="cell' + Emp[c].empid + '">' + Emp[c].address + "</td>" +
+        '<td class="cell' + Emp[c].empid + '">' + Emp[c].website + "</td>" +
         '<td> <button type="button" class="editb" id="edit' + Emp[c].empid + '"> edit data</button></td>' +
         '<td> <button type="button" class="deleteb" id="delete' + Emp[c].empid + '"> delete data </button></td>';
          console.log(Emp[c].empid);
@@ -106,19 +103,30 @@ class actions {
     let cellClass = "cell" + val;
     let cell = document.getElementsByClassName(cellClass);
     this.copyLastRow(val);
-    //console.log(this.copy);
+    
     if (this.flag) {
       this.flag = false;
       for (let i = 0; i <cell.length; i++) {
-        // cell[i].setAttribute("contenteditable", "true");
+    
         if(i===5)
         {
-          cell[i].innerHTML = `<select id = "role1">
-          <option value ="1">QA</option>
-          <option value ="0">Developer</option>
-          <option value ="2">DevOps</option>
-          `;
-        }else{
+          obj3.fetchids().then(data => { cell[i].innerHTML = `<select id = "role1"></select>`
+          var select = document.getElementById("role1");
+          for(let i = 0; i < data.length; i++) {
+            let opt = data[i];
+            let optionElement= document.createElement("option");
+            optionElement.textContent = opt.fname;
+            optionElement.value = opt.fkey.toString();
+            select!.appendChild( optionElement);
+            }});
+        }
+        else if(i===7){
+          cell[i].innerHTML=`<select id = "custid">
+          <option value ="1">Google</option>
+          <option value ="2">Amazon</option>
+          <option value ="3">Yahoo</option>`;
+        }
+        else{
         cell[i].innerHTML =`<input  value = ${this.copy[i]}>`;}
       }
       this.changeButton(val);
@@ -130,7 +138,7 @@ class actions {
       let row_array:any[] = [];
       for(let i =0;i<cell.length;i++)
       {
-        if(i===5)
+        if(i===5||i===7)
         {
           row_array[i] = +(cell[i].childNodes[0]! as HTMLSelectElement).value;
         }else{
@@ -142,7 +150,7 @@ class actions {
         let span1=document.getElementById("span1")!;
         span1.style.fontSize="12px";
         span1.innerHTML="invalid email";
-       // alert("invalid email");
+    
      }
      if(!obj2.phoneno(`${row_array[4]}`))
       { this.flag=false;
@@ -150,7 +158,7 @@ class actions {
         let span1=document.getElementById("span2")!;
         span1.style.fontSize="12px";
         span1.innerHTML="invalid phoneNo.";
-       // alert("invalid email");
+    
      }
      if(!obj2.notempty(row_array[0]))
       { this.flag=false;
@@ -158,7 +166,7 @@ class actions {
         let span1=document.getElementById("span3")!;
         span1.style.fontSize="12px";
         span1.innerHTML="enter firstname";
-       // alert("invalid email");
+    
      }
      if(!obj2.notempty(row_array[6]))
       { this.flag=false;
@@ -166,7 +174,7 @@ class actions {
         let span1=document.getElementById("span4")!;
         span1.style.fontSize="12px";
         span1.innerHTML="enter address";
-       // alert("invalid email");
+    
      }
      if(!obj2.notempty(row_array[2]))
       { this.flag=false;
@@ -174,16 +182,16 @@ class actions {
         let span1=document.getElementById("span5")!;
         span1.style.fontSize="12px";
         span1.innerHTML="enter lastname";
-       // alert("invalid email");
+    
      }
      if(obj2.notempty(row_array[2])&&obj2.email(row_array[3])&&obj2.notempty(row_array[6])&&obj2.notempty(row_array[0])&&obj2.phoneno(`${row_array[4]}`)){
       let newEmployee = new Imp.Employee(row_array[0],row_array[1],
         row_array[2],row_array[3],
         +row_array[4],+row_array[5],
-        row_array[6]);
+        row_array[6],+row_array[7]);
         newEmployee.id = val;
         this.copy = [];
-      fetch(`http://localhost:3000/update/${val}`,{
+      fetch(`http://localhost:3000/updateUser/${val}`,{
         method: "put",
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify(newEmployee)}
@@ -191,8 +199,14 @@ class actions {
       for (let i = 0; i < this.cols; i++){
         if(i===5)
         {
-          cell[i].innerHTML = Imp.ROLES[+(cell[i].childNodes[0]! as HTMLSelectElement).value];
-        }else{
+          let p= (cell[i].childNodes[0]! as HTMLSelectElement);
+            cell[i].innerHTML=p.options[p.selectedIndex].text;
+        }
+        else if(i===7){
+          let p= (cell[i].childNodes[0]! as HTMLSelectElement);
+            cell[i].innerHTML=p.options[p.selectedIndex].text;
+        }
+        else{
         cell[i].innerHTML = (cell[i].childNodes[0] as HTMLInputElement).value;}
       }
       this.changeAgain(val);
@@ -206,7 +220,7 @@ class actions {
     let cellClass = "cell" + val;
     let cell = document.getElementsByClassName(cellClass)!;
     if (this.flag) {
-      fetch(`http://localhost:3000/delete/${val}`,{
+      fetch(`http://localhost:3000/deleteUser/${val}`,{
         method: "delete"
       })
     .then(res=>{
@@ -221,7 +235,7 @@ class actions {
       let deletebtn="delete"+val;
       for(let i=0;i<this.rows-1;i++)
       {
-        //console.log(this.Emp[i].empid);
+    
         this.arr[this.Emp[i].empid]=1;
       }
       let btnid=document.getElementById(deletebtn)!.innerHTML;
@@ -230,7 +244,7 @@ class actions {
       if((btnid=="cancel")&&this.arr[val]==0)
       {
         console.log("entering block");
-          fetch(`http://localhost:3000/delete/${val}`, {
+          fetch(`http://localhost:3000/deleteUser/${val}`, {
               method: "delete"
           })
               .then(res => {
@@ -253,7 +267,7 @@ class actions {
   copyLastRow(val: number) {
     let cellClass = "cell" + val;
     let cell = document.getElementsByClassName(cellClass);
-    //console.log(cell);
+    
     for (let i = 0; i < this.cols; i++) {
       if(i===5)
       {
@@ -290,7 +304,7 @@ class actions {
     for (let i = 0; i < this.rows; i++) {
       console.log(this.Emp[i].empid);
       if (this.removeRow[this.Emp[i].empid] !== true && this.Emp[i].empid !== val) {
-        //console.log(this.Emp[i].empid);
+    
         document.getElementById("edit" + this.Emp[i].empid)!.toggleAttribute("disabled");
         document.getElementById("delete" + this.Emp[i].empid)!.toggleAttribute("disabled");
       }
@@ -301,20 +315,17 @@ class actions {
     for (let i = 0; i < this.rows; i++) {
       console.log(this.Emp[i].empid);
       if (this.removeRow[this.Emp[i].empid] !== true && this.Emp[i].empid  !== val) {
-        //console.log(this.Emp[i].empid);
+    
         document.getElementById("edit" + this.Emp[i].empid)!.toggleAttribute("disabled");
         document.getElementById("delete" + this.Emp[i].empid)!.toggleAttribute("disabled");
       }
     }
   }
   addrow(){
-    //let ind=this.rows
-    //console.log(ind);
-   let ind:any;
-        
-        let newEmployee = new Imp.Employee("","","","",9999999999,2,"");
+        let ind:any;
+        let newEmployee = new Imp.Employee("","","","dummy@gmail.com",9999999999,1,"",1);
         console.log(newEmployee);
-        fetch(`http://localhost:3000/addrow`,{
+        fetch(`http://localhost:3000/addUser`,{
         method: "POST",
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify(newEmployee)}
@@ -329,9 +340,10 @@ class actions {
             '<td class="cell' + ind + '"></td>' +
             '<td class="cell' + ind + '"></td>' +
             '<td class="cell' + ind + '"></td>' +
-            '<td class="cell' + ind + '"></td>' +
+            '<td class="cell' + ind + '">dummy@gmail.com</td>' +
             '<td class="cell' + ind + '">9999999999</td>' +
-            '<td class="cell' + ind + '">'+Imp.ROLES[1]+'</td>' +
+            '<td class="cell' + ind + '">QA</td>' +
+            '<td class="cell' + ind + '"></td>' +
             '<td class="cell' + ind + '"></td>' +
             '<td> <button type="button" class="editb" id="edit' + ind + '">  </button></td>' +
             '<td> <button type="button" class="deleteb" id="delete' + ind + '"> </button></td>'; 

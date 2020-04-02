@@ -6,7 +6,7 @@ const client = new Client({
     password: "test123",
     host: "localhost",
     port: 5432,
-    database: 'postgres'
+    database: 'userdb'
 });
 let express = require("express");
 let app = express();
@@ -19,30 +19,37 @@ function getData(req, res) {
         .connect()
         .then(() => console.log("Successfully connected"))
         .catch(e => console.log(e));
-    client.query('select * from employee order by empid;', (err, result) => {
+    client.query('select users.empid,users.firstname,users.middlename,users.lastname,users.email,users.phoneno,roles.fname,users.address,customer.website from users,customer,roles where users.role=roles.fkey AND users.customer_id=customer.customer_id order by users.empid asc;', (err, result) => {
+        console.log(result.rows);
         res.status(200).json(result.rows);
     });
 }
 app.get("/class2", getData);
 app.delete("/delete/:id", function (req, res) {
     let id1 = req.params.id;
-    client.query(`delete from employee where empid=${id1};`, (err, result) => {
+    client.query(`delete from users where empid=${id1};`, (err, result) => {
         res.send();
     });
 });
 app.put('/update/:id', function (req, res) {
     const value = req.body;
     const id1 = req.params.id;
-    client.query(`update employee set firstname=$1,middlename=$2,lastname=$3,email=$4,phoneno=$5,role=$6,address=$7
-  where empid=${id1};`, [value.firstname, value.middlename, value.lastname, value.email, value.phoneno, value.role, value.address]);
+    client.query(`update users set firstname=$1,middlename=$2,lastname=$3,email=$4,phoneno=$5,role=$6,address=$7,customer_id=$8
+  where empid=${id1};`, [value.firstname, value.middlename, value.lastname, value.email, value.phoneno, value.fname, value.address, value.customer_id]);
     res.send();
     console.log(value);
 });
 app.post('/addrow', function (req, res) {
     const value = req.body;
     //const id1=req.params.id;
-    client.query(`insert into employee(firstname,middlename,lastname,email,phoneno,role,address) values ($1,$2,$3,$4,$5,$6,$7) returning empid;`, [value.firstname, value.middlename, value.lastname, value.email, value.phoneno, value.role, value.address])
+    client.query(`insert into users(firstname,middlename,lastname,email,phoneno,role,address,customer_id) values ($1,$2,$3,$4,$5,$6,$7,$8) returning empid;`, [value.firstname, value.middlename, value.lastname, value.email, value.phoneno, value.role, value.address, value.customer_id])
         .then((result) => res.json(result.rows[0]));
+});
+app.get('/getids', function (req, res) {
+    client.query(`select fkey,fname from roles`, (err, result) => {
+        console.log(result.rows);
+        res.status(200).json(result.rows);
+    });
 });
 // app.delete("/delete/:id",function(req:Request,res:Response){
 // }

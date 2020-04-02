@@ -5,14 +5,15 @@ export var ROLES;
     ROLES[ROLES["DevOps"] = 2] = "DevOps";
 })(ROLES || (ROLES = {}));
 export class Employee {
-    constructor(fname, mname, lname, email, phone, role, address) {
-        this.firstname = fname;
+    constructor(fsname, mname, lname, email, phone, fname, address, customer_id) {
+        this.firstname = fsname;
         this.middlename = mname;
         this.lastname = lname;
         this.email = email;
         this.phoneno = phone;
-        this.role = role;
+        this.fname = fname;
         this.address = address;
+        this.customer_id = customer_id;
     }
 }
 export class fetchData {
@@ -20,5 +21,12 @@ export class fetchData {
         let response = await fetch("http://localhost:3000/class2");
         let data = await response.json();
         return (data);
+    }
+}
+export class ids {
+    async fetchids() {
+        let response = await fetch('http://localhost:3000/getids');
+        let data = await response.json();
+        return data;
     }
 }

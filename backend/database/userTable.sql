@@ -1,4 +1,4 @@
-CREATE TABLE employee
+CREATE TABLE users
 (
   empid SERIAL NOT NULL ,
   firstname VARCHAR(100) NOT NULL,
@@ -9,6 +9,10 @@ CREATE TABLE employee
   role integer,
   address VARCHAR(100) NOT NULL,
   CONSTRAINT employee_role_check CHECK (role IN ('0','1','2')),
-  CONSTRAINT newcheck CHECK (email like '%@%.%'),
-  CONSTRAINT newPK PRIMARY KEY (empid)
-)
+  CONSTRAINT email_validation_check CHECK (email like '%@%.%'),
+  CONSTRAINT user_pk PRIMARY KEY (empid),
+  CONSTRAINT role_fk FOREIGN KEY (role) REFERENCES roles(role_key)
+);
+
+
+
