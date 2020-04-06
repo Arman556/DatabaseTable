@@ -1,10 +1,9 @@
-import * as Imp from "./class2.js";
-import * as Imp1 from "./class4.js";
-let this1 = new Imp.fetchData();
-let obj2 = new Imp1.validations();
-let obj3 = new Imp.ids();
-class actions {
-    //cell:any[]=[];
+import * as Imp from "./fetchData.js";
+import * as Imp1 from "./ValidationChecks.js";
+let fetchData = new Imp.fetchJsonData();
+let validate = new Imp1.validations();
+let userId = new Imp.ids();
+class CrudOperation {
     constructor() {
         this.copy = [];
         this.arrHeaders = [];
@@ -21,14 +20,9 @@ class actions {
             let div = document.getElementById("d1");
             div.innerHTML = " ";
         }
-        this1.fetch1().then(data => obj.create(data));
-        // let data1=this1.fetch1();
-        // this.create(data1);
+        fetchData.fetchdata().then(data => obj.create(data));
     }
     create(Emp) {
-        // document.getElementById("LOAD").innerHTML = "REFRESH DATA";
-        // let div = document.getElementById("id1");
-        // div.innerHTML = " ";
         this.Emp = Emp;
         this.table = document.createElement("table");
         this.arrHeaders = [
@@ -102,13 +96,11 @@ class actions {
         let cellClass = "cell" + val;
         let cell = document.getElementsByClassName(cellClass);
         this.copyLastRow(val);
-        //console.log(this.copy);
         if (this.flag) {
             this.flag = false;
             for (let i = 0; i < cell.length; i++) {
-                // cell[i].setAttribute("contenteditable", "true");
                 if (i === 5) {
-                    obj3.fetchids().then(data => {
+                    userId.fetchids().then(data => {
                         cell[i].innerHTML = `<select id = "role1"></select>`;
                         var select = document.getElementById("role1");
                         for (let i = 0; i < data.length; i++) {
@@ -146,51 +138,46 @@ class actions {
                     row_array[i] = cell[i].childNodes[0].value;
                 }
             }
-            if (!obj2.email(row_array[3])) {
+            if (!validate.email(row_array[3])) {
                 this.flag = false;
                 cell[3].innerHTML += '<span id="span1" style="color:red" ></span>';
                 let span1 = document.getElementById("span1");
                 span1.style.fontSize = "12px";
                 span1.innerHTML = "invalid email";
-                // alert("invalid email");
             }
-            if (!obj2.phoneno(`${row_array[4]}`)) {
+            if (!validate.phoneno(`${row_array[4]}`)) {
                 this.flag = false;
                 cell[4].innerHTML += '<span id="span2" style="color:red" ></span>';
                 let span1 = document.getElementById("span2");
                 span1.style.fontSize = "12px";
                 span1.innerHTML = "invalid phoneNo.";
-                // alert("invalid email");
             }
-            if (!obj2.notempty(row_array[0])) {
+            if (!validate.notempty(row_array[0])) {
                 this.flag = false;
                 cell[0].innerHTML += '<span id="span3" style="color:red" ></span>';
                 let span1 = document.getElementById("span3");
                 span1.style.fontSize = "12px";
                 span1.innerHTML = "enter firstname";
-                // alert("invalid email");
             }
-            if (!obj2.notempty(row_array[6])) {
+            if (!validate.notempty(row_array[6])) {
                 this.flag = false;
                 cell[6].innerHTML += '<span id="span4" style="color:red" ></span>';
                 let span1 = document.getElementById("span4");
                 span1.style.fontSize = "12px";
                 span1.innerHTML = "enter address";
-                // alert("invalid email");
             }
-            if (!obj2.notempty(row_array[2])) {
+            if (!validate.notempty(row_array[2])) {
                 this.flag = false;
                 cell[2].innerHTML += '<span id="span5" style="color:red" ></span>';
                 let span1 = document.getElementById("span5");
                 span1.style.fontSize = "12px";
                 span1.innerHTML = "enter lastname";
-                // alert("invalid email");
             }
-            if (obj2.notempty(row_array[2]) && obj2.email(row_array[3]) && obj2.notempty(row_array[6]) && obj2.notempty(row_array[0]) && obj2.phoneno(`${row_array[4]}`)) {
+            if (validate.notempty(row_array[2]) && validate.email(row_array[3]) && validate.notempty(row_array[6]) && validate.notempty(row_array[0]) && validate.phoneno(`${row_array[4]}`)) {
                 let newEmployee = new Imp.Employee(row_array[0], row_array[1], row_array[2], row_array[3], +row_array[4], +row_array[5], row_array[6], +row_array[7]);
                 newEmployee.id = val;
                 this.copy = [];
-                fetch(`http://localhost:3000/update/${val}`, {
+                fetch(`http://localhost:3000/updateUser/${val}`, {
                     method: "put",
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newEmployee)
@@ -219,7 +206,7 @@ class actions {
         let cellClass = "cell" + val;
         let cell = document.getElementsByClassName(cellClass);
         if (this.flag) {
-            fetch(`http://localhost:3000/delete/${val}`, {
+            fetch(`http://localhost:3000/deleteUser/${val}`, {
                 method: "delete"
             })
                 .then(res => {
@@ -233,7 +220,6 @@ class actions {
         else {
             let deletebtn = "delete" + val;
             for (let i = 0; i < this.rows - 1; i++) {
-                //console.log(this.Emp[i].empid);
                 this.arr[this.Emp[i].empid] = 1;
             }
             let btnid = document.getElementById(deletebtn).innerHTML;
@@ -241,7 +227,7 @@ class actions {
             console.log(this.arr[val]);
             if ((btnid == "cancel") && this.arr[val] == 0) {
                 console.log("entering block");
-                fetch(`http://localhost:3000/delete/${val}`, {
+                fetch(`http://localhost:3000/deleteUser/${val}`, {
                     method: "delete"
                 })
                     .then(res => {
@@ -265,7 +251,6 @@ class actions {
     copyLastRow(val) {
         let cellClass = "cell" + val;
         let cell = document.getElementsByClassName(cellClass);
-        //console.log(cell);
         for (let i = 0; i < this.cols; i++) {
             if (i === 5) {
                 this.copy[i] = cell[i].innerHTML;
@@ -303,7 +288,6 @@ class actions {
         for (let i = 0; i < this.rows; i++) {
             console.log(this.Emp[i].empid);
             if (this.removeRow[this.Emp[i].empid] !== true && this.Emp[i].empid !== val) {
-                //console.log(this.Emp[i].empid);
                 document.getElementById("edit" + this.Emp[i].empid).toggleAttribute("disabled");
                 document.getElementById("delete" + this.Emp[i].empid).toggleAttribute("disabled");
             }
@@ -314,7 +298,6 @@ class actions {
         for (let i = 0; i < this.rows; i++) {
             console.log(this.Emp[i].empid);
             if (this.removeRow[this.Emp[i].empid] !== true && this.Emp[i].empid !== val) {
-                //console.log(this.Emp[i].empid);
                 document.getElementById("edit" + this.Emp[i].empid).toggleAttribute("disabled");
                 document.getElementById("delete" + this.Emp[i].empid).toggleAttribute("disabled");
             }
@@ -324,7 +307,7 @@ class actions {
         let ind;
         let newEmployee = new Imp.Employee("", "", "", "dummy@gmail.com", 9999999999, 1, "", 1);
         console.log(newEmployee);
-        fetch(`http://localhost:3000/addrow`, {
+        fetch(`http://localhost:3000/addUser`, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newEmployee)
@@ -364,4 +347,4 @@ class actions {
         });
     }
 }
-export let obj = new actions();
+export let obj = new CrudOperation();

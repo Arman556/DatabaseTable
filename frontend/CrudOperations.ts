@@ -1,9 +1,9 @@
-import * as Imp from "./class2.js";
-import * as Imp1 from "./class4.js";
-let this1 = new Imp.fetchData();
-let obj2=new Imp1.validations();
-let obj3=new Imp.ids();
-class actions {
+import * as Imp from "./fetchData.js";
+import * as Imp1 from "./ValidationChecks.js";
+let fetchData = new Imp.fetchJsonData();
+let validate=new Imp1.validations();
+let userId=new Imp.ids();
+class CrudOperation implements Imp.CRUD<Imp.Employee> {
   flag: boolean;
   copy: any[];
   cols: number;
@@ -28,7 +28,7 @@ class actions {
       let div = document.getElementById("d1")!;
       div.innerHTML = " ";
     }
-    this1.fetch1().then(data => obj.create(data));
+    fetchData.fetchdata().then(data => obj.create(data));
   }
   create(Emp:any) {
     this.Emp=Emp;
@@ -110,7 +110,7 @@ class actions {
     
         if(i===5)
         {
-          obj3.fetchids().then(data => { cell[i].innerHTML = `<select id = "role1"></select>`
+          userId.fetchids().then(data => { cell[i].innerHTML = `<select id = "role1"></select>`
           var select = document.getElementById("role1");
           for(let i = 0; i < data.length; i++) {
             let opt = data[i];
@@ -144,7 +144,7 @@ class actions {
         }else{
         row_array[i] = (cell[i].childNodes[0] as HTMLInputElement).value;}
       }
-      if(!obj2.email(row_array[3]))
+      if(!validate.email(row_array[3]))
       { this.flag=false;
         cell[3].innerHTML += '<span id="span1" style="color:red" ></span>';
         let span1=document.getElementById("span1")!;
@@ -152,7 +152,7 @@ class actions {
         span1.innerHTML="invalid email";
     
      }
-     if(!obj2.phoneno(`${row_array[4]}`))
+     if(!validate.phoneno(`${row_array[4]}`))
       { this.flag=false;
         cell[4].innerHTML += '<span id="span2" style="color:red" ></span>';
         let span1=document.getElementById("span2")!;
@@ -160,7 +160,7 @@ class actions {
         span1.innerHTML="invalid phoneNo.";
     
      }
-     if(!obj2.notempty(row_array[0]))
+     if(!validate.notempty(row_array[0]))
       { this.flag=false;
         cell[0].innerHTML += '<span id="span3" style="color:red" ></span>';
         let span1=document.getElementById("span3")!;
@@ -168,7 +168,7 @@ class actions {
         span1.innerHTML="enter firstname";
     
      }
-     if(!obj2.notempty(row_array[6]))
+     if(!validate.notempty(row_array[6]))
       { this.flag=false;
         cell[6].innerHTML += '<span id="span4" style="color:red" ></span>';
         let span1=document.getElementById("span4")!;
@@ -176,7 +176,7 @@ class actions {
         span1.innerHTML="enter address";
     
      }
-     if(!obj2.notempty(row_array[2]))
+     if(!validate.notempty(row_array[2]))
       { this.flag=false;
         cell[2].innerHTML += '<span id="span5" style="color:red" ></span>';
         let span1=document.getElementById("span5")!;
@@ -184,7 +184,7 @@ class actions {
         span1.innerHTML="enter lastname";
     
      }
-     if(obj2.notempty(row_array[2])&&obj2.email(row_array[3])&&obj2.notempty(row_array[6])&&obj2.notempty(row_array[0])&&obj2.phoneno(`${row_array[4]}`)){
+     if(validate.notempty(row_array[2])&&validate.email(row_array[3])&&validate.notempty(row_array[6])&&validate.notempty(row_array[0])&&validate.phoneno(`${row_array[4]}`)){
       let newEmployee = new Imp.Employee(row_array[0],row_array[1],
         row_array[2],row_array[3],
         +row_array[4],+row_array[5],
@@ -365,4 +365,4 @@ class actions {
       });    
       }
 }
-export let obj = new actions();
+export let obj = new CrudOperation();
